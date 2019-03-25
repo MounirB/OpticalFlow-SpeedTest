@@ -38,9 +38,9 @@ def save_flows(flows,image,save_dir,num,bound):
     if not os.path.exists(os.path.join(data_root,new_dir,save_dir)):
         os.makedirs(os.path.join(data_root,new_dir,save_dir))
 
-    #save the image
-    save_img=os.path.join(data_root,new_dir,save_dir,'img_{:05d}.jpg'.format(num))
-    scipy.misc.imsave(save_img,image)
+    # #save the image
+    # save_img=os.path.join(data_root,new_dir,save_dir,'img_{:05d}.jpg'.format(num))
+    # scipy.misc.imsave(save_img,image)
 
     #save the flows
     save_x=os.path.join(data_root,new_dir,save_dir,'flow_x_{:05d}.jpg'.format(num))
@@ -62,7 +62,7 @@ def dense_flow(augs):
     :return: no returns
     '''
     video_name,save_dir,step,bound=augs
-    video_path=os.path.join(videos_root,video_name.split('_')[1],video_name)
+    video_path=os.path.join(videos_root, video_name)
 
     # provide two video-read methods: cv2.VideoCapture() and skvideo.io.vread(), both of which need ffmpeg support
 
@@ -71,14 +71,15 @@ def dense_flow(augs):
     #     print 'Could not initialize capturing! ', video_name
     #     exit()
     try:
+        print(video_path)
         videocapture=skvideo.io.vread(video_path)
     except:
-        print '{} read error! '.format(video_name)
+        print('{} read error! '.format(video_name))
         return 0
-    print video_name
+    print(video_name)
     # if extract nothing, exit!
     if videocapture.sum()==0:
-        print 'Could not initialize capturing',video_name
+        print('Could not initialize capturing',video_name)
         exit()
     len_frame=len(videocapture)
     frame_num=0
@@ -137,10 +138,10 @@ def get_video_list():
 
 def parse_args():
     parser = argparse.ArgumentParser(description="densely extract the video frames and optical flows")
-    parser.add_argument('--dataset',default='ucf101',type=str,help='set the dataset name, to find the data path')
-    parser.add_argument('--data_root',default='/n/zqj/video_classification/data',type=str)
+    parser.add_argument('--dataset',default='Crowd-11',type=str,help='set the dataset name, to find the data path')
+    parser.add_argument('--data_root',default='./',type=str)
     parser.add_argument('--new_dir',default='flows',type=str)
-    parser.add_argument('--num_workers',default=4,type=int,help='num of workers to act multi-process')
+    parser.add_argument('--num_workers',default=1,type=int,help='num of workers to act multi-process')
     parser.add_argument('--step',default=1,type=int,help='gap frames')
     parser.add_argument('--bound',default=15,type=int,help='set the maximum of optical flow')
     parser.add_argument('--s_',default=0,type=int,help='start id')
@@ -164,21 +165,28 @@ if __name__ =='__main__':
     num_workers=args.num_workers
     step=args.step
     bound=args.bound
-    s_=args.s_
-    e_=args.e_
+    # s_=args.s_
+    # e_=args.e_
     new_dir=args.new_dir
     mode=args.mode
     #get video list
-    video_list,len_videos=get_video_list()
-    video_list=video_list[s_:e_]
+    # video_list,len_videos=get_video_list()
 
-    len_videos=min(e_-s_,13320-s_) # if we choose the ucf101
-    print 'find {} videos.'.format(len_videos)
+
+    # video_list=video_list[s_:e_]
+    video_list = os.listdir(videos_root)
+    print(video_list)
+
+    # len_videos=min(e_-s_,13320-s_) # if we choose the ucf101
+    # print('find {} videos.'.format(len_videos))
+
+
+
     flows_dirs=[video.split('.')[0] for video in video_list]
-    print 'get videos list done! '
+    print('get videos list done! ')
 
     pool=Pool(num_workers)
     if mode=='run':
-        pool.map(dense_flow,zip(video_list,flows_dirs,[step]*len(video_list),[bound]*len(video_list)))
+        pool.map(dense_flow, zip(video_list, flows_dirs,[step]*len(video_list),[bound]*len(video_list)))
     else: #mode=='debug
         dense_flow((video_list[0],flows_dirs[0],step,bound))
