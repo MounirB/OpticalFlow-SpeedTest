@@ -138,7 +138,7 @@ def get_video_list():
 
 def parse_args():
     parser = argparse.ArgumentParser(description="densely extract the video frames and optical flows")
-    parser.add_argument('--dataset',default='Crowd-11',type=str,help='set the dataset name, to find the data path')
+    parser.add_argument('--dataset',type=str,help='set the dataset name, to find the data path', required=True)
     parser.add_argument('--data_root',default='./',type=str)
     parser.add_argument('--new_dir',default='flows',type=str)
     parser.add_argument('--num_workers',default=1,type=int,help='num of workers to act multi-process')
