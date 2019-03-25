@@ -7,7 +7,6 @@ def video_outta_frames(opticalflows_folder):
     """
     Assembles the optical flow frames within each OF folder extracted using denseflow.py into videos
     :param opticalflows_folder: the OF folder containing the optical flows of each video clip
-    :return: 
     """
     subfolders_list = [os.path.join(opticalflows_folder, subfolder) for subfolder in os.listdir(opticalflows_folder)]
 
