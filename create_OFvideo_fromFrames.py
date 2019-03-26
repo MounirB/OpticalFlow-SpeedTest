@@ -3,6 +3,28 @@ import os
 import argparse
 
 
+def create_flow_video(subfolder, axis):
+    """
+    Creates a flow video following the mentioned axis
+    :param subfolder: path to the subfolder containing the optical flow images
+    :param axis: x or y axis
+    :return: writes video in the opticalflows folder
+    """
+    
+    flow_frames = sorted([os.path.join(subfolder, frame) for frame in os.listdir(subfolder) if frame.startswith("flow_"+axis)])
+    flow_frames_list.append(flow_frames)
+
+    video_name = subfolder + '_' + axis+ '.avi'
+    frame = cv2.imread(flow_frames[0])
+    height, width, layers = frame.shape
+    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
+
+    for flow_frame in flow_frames:
+        video.write(cv2.imread(flow_frame))
+
+    cv2.destroyAllWindows()
+    video.release()
+
 def video_outta_frames(opticalflows_folder):
     """
     Assembles the optical flow frames within each OF folder extracted using denseflow.py into videos
@@ -11,21 +33,10 @@ def video_outta_frames(opticalflows_folder):
     subfolders_list = [os.path.join(opticalflows_folder, subfolder) for subfolder in os.listdir(opticalflows_folder)]
 
     of_frames_list = list()
-    for subfolder in subfolders_list:
-        of_frames = sorted([os.path.join(subfolder, frame) for frame in os.listdir(subfolder) if frame.startswith("flow_x")])
-        of_frames_list.append(of_frames)
-
-        video_name = subfolder + '.avi'
-        frame = cv2.imread(of_frames[0])
-        height, width, layers = frame.shape
-
-        video = cv2.VideoWriter(video_name, 0, 1, (width, height))
-
-        for of_frame in of_frames:
-            video.write(cv2.imread(of_frame))
-
-        cv2.destroyAllWindows()
-        video.release()
+    axes = ['x', 'y']
+    for axis in axes:
+        for subfolder in subfolders_list:
+            create_flow_video(subfolder, axis)
 
 
 def main(args):
