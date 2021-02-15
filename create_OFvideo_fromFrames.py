@@ -12,7 +12,6 @@ def create_flow_video(subfolder, axis):
     """
     
     flow_frames = sorted([os.path.join(subfolder, frame) for frame in os.listdir(subfolder) if frame.startswith("flow_"+axis)])
-    flow_frames_list.append(flow_frames)
 
     video_name = subfolder + '_' + axis+ '.avi'
     frame = cv2.imread(flow_frames[0])
